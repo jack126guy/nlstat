@@ -12,7 +12,7 @@ To use it, simply pass the name of a file as an argument on the command line:
 
 	nlstat [file]
 
-# Machine-Readable Output
+## Machine-Readable Output
 
 The lines beginning with a colon (":") are intended to convey machine-readable information. In order, they are:
 
