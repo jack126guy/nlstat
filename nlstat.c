@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 		c = getc(infile);
 	}
 	if(ferror(infile)) {
-		fputs("Error reading file; printing stats so far...", stderr);
+		fputs("Error reading file; printing stats so far...\n", stderr);
 		print_stats();
 		fclose(infile);
 		return EXIT_FAILURE;
