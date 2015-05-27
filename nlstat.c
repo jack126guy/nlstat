@@ -48,8 +48,7 @@ int main(int argc, char** argv) {
 		perror("Could not open the file");
 		return EXIT_FAILURE;
 	}
-	c = getc(infile);
-	while(c != EOF) {
+	while((c = getc(infile)) != EOF) {
 		switch(c) {
 			case '\r':
 				maccount++;
@@ -71,7 +70,6 @@ int main(int argc, char** argv) {
 				hascr = 0;
 				lastnewline = 0;
 		}
-		c = getc(infile);
 	}
 	if(ferror(infile)) {
 		fputs("Error reading file; printing stats so far...\n", stderr);
