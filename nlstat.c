@@ -87,7 +87,7 @@ void print_stats(void) {
 	printf(":%lu\n", doscount);
 	puts("Unix newlines (\\n):");
 	printf(":%lu\n", unixcount);
-	puts("Classic Mac newlines(\\r):");
+	puts("Classic Mac newlines (\\r):");
 	printf(":%lu\n", maccount);
 	if(lastnewline) {
 		puts("Found a newline at the end of the file");
