@@ -35,7 +35,7 @@ struct newline_data {
 };
 
 static int count_newlines(FILE* file, struct newline_data* data);
-static void print_stats(const struct newline_data* data);
+static void print_stats(const struct newline_data* data, const char* filename);
 
 int main(int argc, char** argv) {
 	struct newline_data data;
@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 	fclose(infile);
-	print_stats(&data);
+	print_stats(&data, argv[1]);
 	return EXIT_SUCCESS;
 }
 
@@ -101,18 +101,15 @@ int count_newlines(FILE* file, struct newline_data* data) {
 	return 0;
 }
 
-void print_stats(const struct newline_data* data) {
-	puts("DOS/Windows newlines (\\r\\n):");
-	printf(":%lu\n", data->dos_count);
-	puts("Unix newlines (\\n):");
-	printf(":%lu\n", data->unix_count);
-	puts("Classic Mac newlines (\\r):");
-	printf(":%lu\n", data->mac_count);
-	if(data->newline_at_end) {
-		puts("Found a newline at the end of the file");
-		puts(":1");
-	} else {
-		puts("No newline at the end of the file");
-		puts(":0");
+void print_stats(const struct newline_data* data, const char* filename) {
+	printf(
+		"%lu %lu %lu %d",
+		data->dos_count,
+		data->unix_count,
+		data->mac_count,
+		data->newline_at_end);
+	if(filename) {
+		printf(" %s", filename);
 	}
+	printf("\n");
 }
