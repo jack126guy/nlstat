@@ -39,19 +39,22 @@ static int count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data, const char* filename);
 
 int main(int argc, char** argv) {
-	int result;
+	int i;
+	int has_failures = 0;
 
 	if(argc < 2) {
 		fprintf(stderr, "Usage: %s [file]\n", argv[0]);
 		return EXIT_FAILURE;
-	} else if(argc > 2) {
-		fputs("Warning: nlstat does not (currently) support multiple arguments.\n\n", stderr);
 	}
-	result = process_file(argv[1]);
-	if(result != 0) {
-		return EXIT_FAILURE;
+
+	for(i = 1; i < argc; i++) {
+		int result = process_file(argv[i]);
+		if(result != 0) {
+			has_failures = 1;
+		}
 	}
-	return EXIT_SUCCESS;
+
+	return has_failures ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
 int process_file(const char* filename) {
