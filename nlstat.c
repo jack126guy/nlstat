@@ -25,16 +25,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static unsigned long doscount = 0;
-static unsigned long unixcount = 0;
-static unsigned long maccount = 0;
-static int lastnewline = 0;
+struct newline_data {
+	unsigned long dos_count;
+	unsigned long unix_count;
+	unsigned long mac_count;
+	int newline_at_end;
+};
 
-static void print_stats(void);
+static void print_stats(const struct newline_data* data);
 
 int main(int argc, char** argv) {
 	int c;
 	int hascr = 0;
+	struct newline_data data = { 0 };
 	FILE* infile;
 
 	if(argc < 2) {
@@ -51,45 +54,45 @@ int main(int argc, char** argv) {
 	while((c = getc(infile)) != EOF) {
 		switch(c) {
 			case '\r':
-				maccount++;
+				data.mac_count++;
 				hascr = 1;
-				lastnewline = 1;
+				data.newline_at_end = 1;
 				break;
 			case '\n':
 				if(hascr) {
 					/* Originally assumed Mac but incorrect */
-					maccount--;
-					doscount++;
+					data.mac_count--;
+					data.dos_count++;
 				} else {
-					unixcount++;
+					data.unix_count++;
 				}
 				hascr = 0;
-				lastnewline = 1;
+				data.newline_at_end = 1;
 				break;
 			default:
 				hascr = 0;
-				lastnewline = 0;
+				data.newline_at_end = 0;
 		}
 	}
 	if(ferror(infile)) {
 		fputs("Error reading file; printing stats so far...\n", stderr);
-		print_stats();
+		print_stats(&data);
 		fclose(infile);
 		return EXIT_FAILURE;
 	}
-	print_stats();
+	print_stats(&data);
 	fclose(infile);
 	return EXIT_SUCCESS;
 }
 
-void print_stats(void) {
+void print_stats(const struct newline_data* data) {
 	puts("DOS/Windows newlines (\\r\\n):");
-	printf(":%lu\n", doscount);
+	printf(":%lu\n", data->dos_count);
 	puts("Unix newlines (\\n):");
-	printf(":%lu\n", unixcount);
+	printf(":%lu\n", data->unix_count);
 	puts("Classic Mac newlines (\\r):");
-	printf(":%lu\n", maccount);
-	if(lastnewline) {
+	printf(":%lu\n", data->mac_count);
+	if(data->newline_at_end) {
 		puts("Found a newline at the end of the file");
 		puts(":1");
 	} else {
