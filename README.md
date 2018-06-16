@@ -8,15 +8,25 @@ Currently, `nlstat` detects three major newline conventions:
 * Unix (`"\n"`, LF)
 * Classic Mac OS (`"\r"`, CR)
 
-To use it, simply pass the name of a file as an argument on the command line:
+To use it, simply pass the name of one or files as an argument on the command line:
 
-	nlstat [file]
+	nlstat [file...]
 
-## Machine-Readable Output
+## Output Format
 
-The lines beginning with a colon (":") are intended to convey machine-readable information. In order, they are:
+The output format is similar to that of the `wc` program on Unix-like systems.
 
-* Number of DOS/Windows newlines
-* Number of Unix newlines
-* Number of Classic Mac newlines
-* Newline at end of file (1 if there is a newline, 0 if not)
+Each file results in a single line of output. Each line consists of multiple fields separated by spaces.
+
+In order, the fields are:
+
+1. Number of DOS/Windows newlines
+2. Number of Unix newlines
+3. Number of Classic Mac newlines
+4. Newline at end of file (1 if there is a newline, 0 if not)
+5. The filename
+
+For example:
+
+	0 21 0 1 code-with-unix-newlines.c
+	35 0 0 0 text-with-windows-newlines.txt
