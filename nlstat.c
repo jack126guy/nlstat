@@ -36,7 +36,7 @@ static void count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data);
 
 int main(int argc, char** argv) {
-	struct newline_data data = { 0 };
+	struct newline_data data;
 	FILE* infile;
 
 	if(argc < 2) {
