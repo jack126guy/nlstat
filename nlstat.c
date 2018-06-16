@@ -50,6 +50,10 @@ int main(int argc, char** argv) {
 	for(i = 1; i < argc; i++) {
 		int result = process_file(argv[i]);
 		if(result != 0) {
+			fprintf(stderr,
+				"Error reading %s: %s\n",
+				argv[i],
+				strerror(result));
 			has_failures = 1;
 		}
 	}
@@ -64,12 +68,10 @@ int process_file(const char* filename) {
 
 	file = fopen(filename, "rb");
 	if(!file) {
-		fprintf(stderr, "Could not open %s: %s\n", filename, strerror(errno));
 		return errno;
 	}
 	result = count_newlines(file, &data);
 	if(result != 0) {
-		fprintf(stderr, "Error reading file: %s\n", strerror(result));
 		fclose(file);
 		return result;
 	}
