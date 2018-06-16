@@ -34,12 +34,11 @@ struct newline_data {
 	int newline_at_end;
 };
 
+static int process_file(const char* filename);
 static int count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data, const char* filename);
 
 int main(int argc, char** argv) {
-	struct newline_data data;
-	FILE* infile;
 	int result;
 
 	if(argc < 2) {
@@ -48,20 +47,32 @@ int main(int argc, char** argv) {
 	} else if(argc > 2) {
 		fputs("Warning: nlstat does not (currently) support multiple arguments.\n\n", stderr);
 	}
-	infile = fopen(argv[1], "rb");
-	if(!infile) {
-		perror("Could not open the file");
+	result = process_file(argv[1]);
+	if(result != 0) {
 		return EXIT_FAILURE;
 	}
-	result = count_newlines(infile, &data);
+	return EXIT_SUCCESS;
+}
+
+int process_file(const char* filename) {
+	struct newline_data data;
+	FILE* file;
+	int result;
+
+	file = fopen(filename, "rb");
+	if(!file) {
+		fprintf(stderr, "Could not open %s: %s\n", filename, strerror(errno));
+		return errno;
+	}
+	result = count_newlines(file, &data);
 	if(result != 0) {
 		fprintf(stderr, "Error reading file: %s\n", strerror(result));
-		fputs("Printing stats so far...\n", stderr);
-		return EXIT_FAILURE;
+		fclose(file);
+		return result;
 	}
-	fclose(infile);
-	print_stats(&data, argv[1]);
-	return EXIT_SUCCESS;
+	fclose(file);
+	print_stats(&data, filename);
+	return 0;
 }
 
 int count_newlines(FILE* file, struct newline_data* data) {
