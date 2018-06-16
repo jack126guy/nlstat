@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 	int has_failures = 0;
 
 	if(argc < 2) {
-		fprintf(stderr, "Usage: %s [file]\n", argv[0]);
+		fprintf(stderr, "Usage: %s [file...]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 
