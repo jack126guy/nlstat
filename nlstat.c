@@ -32,11 +32,10 @@ struct newline_data {
 	int newline_at_end;
 };
 
+static void count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data);
 
 int main(int argc, char** argv) {
-	int c;
-	int hascr = 0;
 	struct newline_data data = { 0 };
 	FILE* infile;
 
@@ -51,38 +50,46 @@ int main(int argc, char** argv) {
 		perror("Could not open the file");
 		return EXIT_FAILURE;
 	}
-	while((c = getc(infile)) != EOF) {
+	count_newlines(infile, &data);
+	fclose(infile);
+	print_stats(&data);
+	return EXIT_SUCCESS;
+}
+
+void count_newlines(FILE* file, struct newline_data* data) {
+	int c;
+	int hascr = 0;
+
+	data->dos_count = 0;
+	data->unix_count = 0;
+	data->mac_count = 0;
+	data->newline_at_end = 0;
+	while((c = getc(file)) != EOF) {
 		switch(c) {
 			case '\r':
-				data.mac_count++;
+				data->mac_count++;
 				hascr = 1;
-				data.newline_at_end = 1;
+				data->newline_at_end = 1;
 				break;
 			case '\n':
 				if(hascr) {
 					/* Originally assumed Mac but incorrect */
-					data.mac_count--;
-					data.dos_count++;
+					data->mac_count--;
+					data->dos_count++;
 				} else {
-					data.unix_count++;
+					data->unix_count++;
 				}
 				hascr = 0;
-				data.newline_at_end = 1;
+				data->newline_at_end = 1;
 				break;
 			default:
 				hascr = 0;
-				data.newline_at_end = 0;
+				data->newline_at_end = 0;
 		}
 	}
-	if(ferror(infile)) {
+	if(ferror(file)) {
 		fputs("Error reading file; printing stats so far...\n", stderr);
-		print_stats(&data);
-		fclose(infile);
-		return EXIT_FAILURE;
 	}
-	print_stats(&data);
-	fclose(infile);
-	return EXIT_SUCCESS;
 }
 
 void print_stats(const struct newline_data* data) {
