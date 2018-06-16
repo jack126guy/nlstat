@@ -24,6 +24,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 
 struct newline_data {
 	unsigned long dos_count;
@@ -32,12 +34,13 @@ struct newline_data {
 	int newline_at_end;
 };
 
-static void count_newlines(FILE* file, struct newline_data* data);
+static int count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data);
 
 int main(int argc, char** argv) {
 	struct newline_data data;
 	FILE* infile;
+	int result;
 
 	if(argc < 2) {
 		fprintf(stderr, "Usage: %s [file]\n", argv[0]);
@@ -50,13 +53,18 @@ int main(int argc, char** argv) {
 		perror("Could not open the file");
 		return EXIT_FAILURE;
 	}
-	count_newlines(infile, &data);
+	result = count_newlines(infile, &data);
+	if(result != 0) {
+		fprintf(stderr, "Error reading file: %s\n", strerror(result));
+		fputs("Printing stats so far...\n", stderr);
+		return EXIT_FAILURE;
+	}
 	fclose(infile);
 	print_stats(&data);
 	return EXIT_SUCCESS;
 }
 
-void count_newlines(FILE* file, struct newline_data* data) {
+int count_newlines(FILE* file, struct newline_data* data) {
 	int c;
 	int hascr = 0;
 
@@ -88,8 +96,9 @@ void count_newlines(FILE* file, struct newline_data* data) {
 		}
 	}
 	if(ferror(file)) {
-		fputs("Error reading file; printing stats so far...\n", stderr);
+		return errno;
 	}
+	return 0;
 }
 
 void print_stats(const struct newline_data* data) {
