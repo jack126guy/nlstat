@@ -119,13 +119,10 @@ int count_newlines(FILE* file, struct newline_data* data) {
 
 void print_stats(const struct newline_data* data, const char* filename) {
 	printf(
-		"%lu %lu %lu %d",
+		"%lu %lu %lu %d %s\n",
 		data->dos_count,
 		data->unix_count,
 		data->mac_count,
-		data->newline_at_end);
-	if(filename) {
-		printf(" %s", filename);
-	}
-	printf("\n");
+		data->newline_at_end,
+		filename);
 }
