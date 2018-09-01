@@ -37,10 +37,13 @@ struct newline_data {
 static int process_file(const char* filename, struct newline_data* data);
 static int count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data, const char* filename);
+static void print_stats_machine(const struct newline_data* data, const char* filename);
 
 int main(int argc, char** argv) {
 	int i;
 	struct newline_data data;
+	int machine_format = 0;
+	int first_file_arg = 1;
 	int has_failures = 0;
 
 	if(argc < 2) {
@@ -48,10 +51,19 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	for(i = 1; i < argc; i++) {
+	if(strcmp(argv[1], "-m") == 0) {
+		machine_format = 1;
+		first_file_arg = 2;
+	}
+
+	for(i = first_file_arg; i < argc; i++) {
 		int result = process_file(argv[i], &data);
 		if(result == 0) {
-			print_stats(&data, argv[i]);
+			if (machine_format) {
+				print_stats_machine(&data, argv[i]);
+			} else {
+				print_stats(&data, argv[i]);
+			}
 		} else {
 			fprintf(stderr,
 				"Error reading %s: %s\n",
@@ -119,6 +131,19 @@ int count_newlines(FILE* file, struct newline_data* data) {
 }
 
 void print_stats(const struct newline_data* data, const char* filename) {
+	printf("Stats for %s\n", filename);
+	printf("DOS/Windows newlines (\\r\\n): %lu\n", data->dos_count);
+	printf("Unix newlines (\\n): %lu\n", data->unix_count);
+	printf("Classic Mac newlines (\\r): %lu\n", data->mac_count);
+	if(data->newline_at_end) {
+		puts("Found a newline at the end of the file");
+	} else {
+		puts("No newline at the end of the file");
+	}
+	puts("");
+}
+
+void print_stats_machine(const struct newline_data* data, const char* filename) {
 	printf(
 		"%lu %lu %lu %d %s\n",
 		data->dos_count,
