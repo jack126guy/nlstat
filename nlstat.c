@@ -34,12 +34,13 @@ struct newline_data {
 	int newline_at_end;
 };
 
-static int process_file(const char* filename);
+static int process_file(const char* filename, struct newline_data* data);
 static int count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data, const char* filename);
 
 int main(int argc, char** argv) {
 	int i;
+	struct newline_data data;
 	int has_failures = 0;
 
 	if(argc < 2) {
@@ -48,8 +49,10 @@ int main(int argc, char** argv) {
 	}
 
 	for(i = 1; i < argc; i++) {
-		int result = process_file(argv[i]);
-		if(result != 0) {
+		int result = process_file(argv[i], &data);
+		if(result == 0) {
+			print_stats(&data, argv[i]);
+		} else {
 			fprintf(stderr,
 				"Error reading %s: %s\n",
 				argv[i],
@@ -61,8 +64,7 @@ int main(int argc, char** argv) {
 	return has_failures ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
-int process_file(const char* filename) {
-	struct newline_data data;
+int process_file(const char* filename, struct newline_data* data) {
 	FILE* file;
 	int result;
 
@@ -70,13 +72,12 @@ int process_file(const char* filename) {
 	if(!file) {
 		return errno;
 	}
-	result = count_newlines(file, &data);
+	result = count_newlines(file, data);
 	if(result != 0) {
 		fclose(file);
 		return result;
 	}
 	fclose(file);
-	print_stats(&data, filename);
 	return 0;
 }
 
