@@ -10,13 +10,15 @@ Currently, `nlstat` detects three major newline conventions:
 
 To use it, simply pass the name of one or files as an argument on the command line:
 
-	nlstat [file...]
+	nlstat file...
 
-## Output Format
+## Machine-Readable Output
 
-The output format is similar to that of the `wc` program on Unix-like systems.
+You can pass the optional `-m` option as the first argument to change the output to a machine-readable format:
 
-Each file results in a single line of output. Each line consists of multiple fields separated by spaces.
+	nlstat -m file...
+
+The format is similar to that of the `wc` program on Unix-like systems. Each file results in a single line of output. Each line consists of multiple fields separated by spaces.
 
 In order, the fields are:
 
