@@ -34,6 +34,8 @@ struct newline_data {
 	int newline_at_end;
 };
 
+typedef void (*print_stats_func)(const struct newline_data*, const char*);
+
 static int process_file(const char* filename, struct newline_data* data);
 static int count_newlines(FILE* file, struct newline_data* data);
 static void print_stats(const struct newline_data* data, const char* filename);
@@ -42,7 +44,7 @@ static void print_stats_machine(const struct newline_data* data, const char* fil
 int main(int argc, char** argv) {
 	int i;
 	struct newline_data data;
-	int machine_format = 0;
+	print_stats_func print = print_stats;
 	int first_file_arg = 1;
 	int has_failures = 0;
 
@@ -52,18 +54,14 @@ int main(int argc, char** argv) {
 	}
 
 	if(strcmp(argv[1], "-m") == 0) {
-		machine_format = 1;
+		print = print_stats_machine;
 		first_file_arg = 2;
 	}
 
 	for(i = first_file_arg; i < argc; i++) {
 		int result = process_file(argv[i], &data);
 		if(result == 0) {
-			if (machine_format) {
-				print_stats_machine(&data, argv[i]);
-			} else {
-				print_stats(&data, argv[i]);
-			}
+			print(&data, argv[i]);
 		} else {
 			fprintf(stderr,
 				"Error reading %s: %s\n",
